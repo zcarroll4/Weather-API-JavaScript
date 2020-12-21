@@ -1,0 +1,165 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap.css">
+    <style>
+        body {
+            font-family:coolvetica;
+            background-color:lightgray;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="border:1px solid black; margin-bottom: 100px;">
+        <div class="row bg-dark text-white" style="height:auto;">
+            <div class="col-lg-2 col-sm-0"></div>
+            <div class="col-lg-8 col-sm-12 text-center" style="text-shadow: 4px 4px black;
+            font-size: 4rem;">
+                Weather Application API
+            </div>
+            <div class="col-lg-2 col-sm-0"></div>
+        </div>
+        <div class="row" style=" padding-top:20px; background-color: black; height:auto;">
+            <div class="col-lg-4 col-sm-0"></div>
+            <div class="col-lg-4 col-sm-12">
+                <div class="panel-group">
+                    <div class="panel panel-default">
+                        <div class="panel-heading text-center bg-dark text-white"><h1>Enter Zip</h1></div>
+                        <div class="panel-body text-center">
+                            <input type="text" id="zipInput" class="text-center form-control input-lg" placeholder="" style="font-size:large;" /><br />
+                            <button class="btn btn-lg bg-dark text-white col-lg-12" id="getWeatherBtn" onclick="updateByZip(zipInput.value)" style="margin-top:5px; padding:10px;"><h3>Get Weather</h3></button>
+                            <button class="btn btn-lg bg-dark text-white col-lg-12" onclick="resetWeather()" id="btnResetWeather" style="visibility: hidden;
+                            margin-top:5px; padding:10px;"><h3>Try Again</h3></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-0"></div>
+
+            </div>
+        </div>
+        <div class="row" id="weatherResults" style="padding-top: 20px; background-color: black; height: auto; display:none;">
+            <div class="col-lg-2 col-sm-0"></div>
+            <div class="col-lg-8 col-sm-12">
+                <!--Weather Results-->
+                <div class="row bg-light">
+                    <div class="col-lg-2 col-xs-0 col-sm-0"></div>
+                    <div class="col-lg-4 col-md-6 col-xs-6">
+                        <!--Weather Icon-->
+                        <img id="weatherIcon" width="100" />
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-xs-6 text-center">
+                        <!--Weather Details-->
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="weatherTemp" style="font-size:9rem;"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="weatherDescription" style="font-size:3rem;"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="weatherWinds" style="font-size:3rem;"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="weatherHumidity" style="font-size:3rem;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-0 col-sm-0"></div>
+                </div>
+             <div class="row bg-light" style="margin-bottom:50px;">
+                 <div class="col-lg-12 col-xs-12 text-center">
+                     <!--City Location-->
+                     <div id="weatherLocation" style="font-size:5rem;"></div>
+                 </div>
+             </div>
+            </div>
+            <div class="col-lg-2 col-sm-0"></div>
+            <br />
+
+        </div>
+
+
+    </div>
+       
+    <script>
+        window.onload = function () {
+            document.getElementById('zipInput').value = ""; // clear value out input field
+            weatherIcon = document.getElementById("weatherIcon");
+            weatherTemp = document.getElementById("weatherTemp");
+            weatherDescription = document.getElementById("weatherDescription");
+            weatherWinds = document.getElementById("weatherWinds");
+            weatherHumidity = document.getElementById("weatherHumidity");
+            weatherLocation = document.getElementById("weatherLocation");
+        };
+
+        function resetWeather (){
+            document.getElementById("zipInput").innerHTML="";
+            document.getElementById("btnResetWeather").style.visibility="hidden";
+            location.reload();
+        }
+
+        var apiKey = "6067074c07a54e73b0e2b33fa76fbe5b";
+        var weatherIcon;
+        var weatherTemp;
+        var weatherDescription;
+        var weatherWinds;
+        var weatherHumidity;
+        var weatherLocation;
+ 
+        var inputZip = document.getElementById("zipInput").value;
+      
+        function updateByZip(inputZip) {
+            document.getElementById("weatherResults").style.display = "block";
+            //if(inputZip == null) alert('You must enter a zip'); return;
+            var url = "https://api.openweathermap.org/data/2.5/weather?" +
+                "zip=" + inputZip +
+                "&appid=" + apiKey + "&units=imperial";          
+            sendRequest(url);
+        }
+        function sendRequest(url) {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var data = JSON.parse(xmlhttp.responseText);
+                    var weather = {};
+                    weather.icon = data.weather[0].id;
+                    weather.temp = Math.round(data.main.temp);
+                    weather.loc = data.name;
+                    weather.desc = data.weather[0].description;
+                    weather.humi = data.main.humidity;
+                    weather.windSpeed = Math.round(data.wind.speed);
+                    update(weather);
+                }
+            };
+
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+        }
+        function update(weather) {
+            // document.getElementById("btn-submit").innerHTML = "Please Wait...";
+            if (weather.icon != 200) {
+                weatherIcon.src = "imgs/codes/" + "sun-color" + ".png";
+            }
+            else {
+                icon.src = "imgs/codes/" + weather.icon + ".png";
+            }
+            weatherTemp.innerHTML = weather.temp + "&deg;";
+            weatherDescription.innerHTML= weather.desc.charAt(0).toUpperCase() + weather.desc.slice(1);;
+            weatherWinds.innerHTML = "Winds: " + weather.windSpeed +"mph";
+            weatherHumidity.innerHTML = "Humidity: "+ weather.humi +"%";
+            weatherLocation.innerHTML = weather.loc;
+            document.getElementById("btnResetWeather").style.visibility="visible";
+            document.getElementById("getWeatherBtn").style.visibility="hidden";
+        }
+       
+
+    </script>
+</body>
+</html>
