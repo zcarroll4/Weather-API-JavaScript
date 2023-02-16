@@ -2,7 +2,7 @@
 OpenWeather Map API - JavaScript Application
 
 ### Website Link - 
-- [Website Link](https://zachcarroll.me/weather/)
+- [Website Link](https://projects.zachcarroll.me/weather/)
 
 
  ### User Interface
